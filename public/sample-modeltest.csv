@@ -1,0 +1,3 @@
+Position,Roll,Mobile,Name,College,HSC,Model_Test,PHY_true,PHY_false,PHY_marks,CHEM_true,CHEM_false,CHEM_marks,ICT_true,ICT_false,ICT_marks,MATH_BIO_true,MATH_BIO_false,MATH_BIO_marks,BIO_true,BIO_false,BIO_marks,MATH_true,MATH_false,MATH_marks,PHY_CHEM_ICT,Best_Optional,Total,Time,Total_Wrong
+1,101,01712345678,John Doe,ABC College,2022,1,25,5,75,22,8,66,20,5,60,28,2,84,0,0,0,0,0,0,201,MATH,285,2:45,20
+2,102,01712345679,Jane Smith,XYZ College,2022,1,24,6,72,23,7,69,19,6,57,27,3,81,0,0,0,0,0,0,198,MATH,279,2:30,22

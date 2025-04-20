@@ -10,6 +10,7 @@ import type { StudentResult } from "@/types/types"
 export default function Home() {
   const [results, setResults] = useState<StudentResult[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [selectedModelTest, setSelectedModelTest] = useState<string>("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [availableModelTests, setAvailableModelTests] = useState<string[]>([])
@@ -18,10 +19,21 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true)
+      setError(null)
+
       try {
-        // Replace with your actual API endpoint
         const response = await fetch("/api/results")
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || "Failed to fetch results")
+        }
+
         const data = await response.json()
+
+        if (!Array.isArray(data)) {
+          throw new Error("Invalid data format received from API")
+        }
 
         setResults(data)
 
@@ -30,6 +42,7 @@ export default function Home() {
         setAvailableModelTests(modelTests)
       } catch (error) {
         console.error("Error fetching results:", error)
+        setError(error instanceof Error ? error.message : "An unknown error occurred")
       } finally {
         setIsLoading(false)
       }
@@ -67,6 +80,15 @@ export default function Home() {
             <div className="flex justify-center items-center h-64">
               <LoadingSpinner />
             </div>
+          ) : error ? (
+            <div className="bg-white p-6 rounded-lg shadow text-center">
+              <h2 className="text-xl font-semibold text-red-600 mb-2">Error Loading Results</h2>
+              <p className="text-gray-700">{error}</p>
+              <p className="text-gray-600 mt-4">
+                Please make sure you have CSV files in the public directory with names like modeltest01.csv,
+                modeltest02.csv, etc.
+              </p>
+            </div>
           ) : (
             <>
               {results.length > 0 ? (
@@ -84,7 +106,8 @@ export default function Home() {
                 <div className="bg-white p-6 rounded-lg shadow text-center">
                   <h2 className="text-xl font-semibold text-gray-800 mb-2">No Results Available</h2>
                   <p className="text-gray-600">
-                    No test results have been loaded from the backend. Please check your API connection.
+                    No test results were found in the CSV files. Please check that your CSV files are properly
+                    formatted.
                   </p>
                 </div>
               )}
