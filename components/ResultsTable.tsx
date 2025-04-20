@@ -130,7 +130,7 @@ export default function ResultsTable({ results }: ResultsTableProps) {
                   <div className="text-sm text-gray-900">{result.Roll || "-"}</div>
                 </td>
                 <td className="px-3 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{result.Mobile ? maskMobileNumber(result.Mobile) : "-"}</div>
+                  <div className="text-sm text-gray-900">{maskMobileNumber(result.Mobile)}</div>
                 </td>
                 <td className="px-3 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">{result.Name || "-"}</div>

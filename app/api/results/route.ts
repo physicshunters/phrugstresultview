@@ -35,20 +35,28 @@ export async function GET() {
       })
 
       if (parseResult.data && Array.isArray(parseResult.data)) {
-        // Log the first row to see the actual structure
-        console.log("CSV Structure:", parseResult.data[0])
-
         // Process each row based on the actual structure
         const processedData = parseResult.data.map((row: any, index) => {
           // Extract model test number from filename if not in data
           const modelTestMatch = file.match(/modeltest(\d+)/i)
           const modelTestNumber = modelTestMatch ? Number.parseInt(modelTestMatch[1]) : 0
 
+          // Format mobile number - ensure it's a string
+          let mobileStr = row.Mobile ? String(row.Mobile).trim() : ""
+
+          // Remove any non-digit characters
+          mobileStr = mobileStr.replace(/\D/g, "")
+
+          // If it's 10 digits, add a leading "0"
+          if (mobileStr.length === 10) {
+            mobileStr = "0" + mobileStr
+          }
+
           // Create a standardized object with all required fields
           return {
             Position: row.Position || index + 1,
             Roll: row.Roll || 0,
-            Mobile: row.Mobile || "",
+            Mobile: mobileStr,
             Name: row.Name || "",
             College: row.College || "",
             HSC: row.HSC || "",
