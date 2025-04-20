@@ -4,7 +4,7 @@ export interface StudentResult {
   Mobile: string
   Name: string
   College: string
-  HSC: string
+  HSC?: string
   Model_Test: number | string
   PHY_true: number
   PHY_false: number
@@ -21,9 +21,9 @@ export interface StudentResult {
   BIO_true: number
   BIO_false: number
   BIO_marks: number
-  MATH_true: number
-  MATH_false: number
-  MATH_marks: number
+  MATH_true?: number
+  MATH_false?: number
+  MATH_marks?: number
   PHY_CHEM_ICT: number
   Best_Optional: string
   Total: number

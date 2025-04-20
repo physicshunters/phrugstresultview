@@ -73,13 +73,13 @@ export default function ResultsTable({ results }: ResultsTableProps) {
                 scope="col"
                 className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                {results.some((r) => r.MATH_true !== undefined && r.MATH_true > 0) ? "Math" : "Math/Bio"}
+                Math/Bio
               </th>
               <th
                 scope="col"
                 className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                {results.some((r) => r.BIO_true !== undefined && r.BIO_true > 0) ? "Biology" : ""}
+                Biology
               </th>
               <th
                 scope="col"
@@ -172,15 +172,15 @@ export default function ResultsTable({ results }: ResultsTableProps) {
                 {/* Math/Bio */}
                 <td className="px-3 py-4 whitespace-nowrap">
                   <div className="text-xs text-center">
-                    <span className="text-green-600">{result.MATH_true || result.MATH_BIO_true || 0}T</span> /{" "}
-                    <span className="text-red-600">{result.MATH_false || result.MATH_BIO_false || 0}F</span>
-                    <div className="font-medium text-gray-900">{result.MATH_marks || result.MATH_BIO_marks || 0}</div>
+                    <span className="text-green-600">{result.MATH_BIO_true || 0}T</span> /{" "}
+                    <span className="text-red-600">{result.MATH_BIO_false || 0}F</span>
+                    <div className="font-medium text-gray-900">{result.MATH_BIO_marks || 0}</div>
                   </div>
                 </td>
 
-                {/* Biology (if exists) */}
+                {/* Biology */}
                 <td className="px-3 py-4 whitespace-nowrap">
-                  {result.BIO_true !== undefined && result.BIO_true > 0 ? (
+                  {result.BIO_true > 0 || result.BIO_marks > 0 ? (
                     <div className="text-xs text-center">
                       <span className="text-green-600">{result.BIO_true || 0}T</span> /{" "}
                       <span className="text-red-600">{result.BIO_false || 0}F</span>

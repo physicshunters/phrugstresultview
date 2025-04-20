@@ -35,22 +35,13 @@ export default function Home() {
           throw new Error("Invalid data format received from API")
         }
 
-        // Validate and sanitize data
-        const sanitizedData = data.map((item: any) => ({
-          ...item,
-          // Ensure string properties are strings or empty strings
-          Name: typeof item.Name === "string" ? item.Name : String(item.Name || ""),
-          College: typeof item.College === "string" ? item.College : String(item.College || ""),
-          Mobile: typeof item.Mobile === "string" ? item.Mobile : String(item.Mobile || ""),
-          Roll: item.Roll || 0,
-          Model_Test: item.Model_Test || 0,
-          // Add other properties with defaults as needed
-        }))
-
-        setResults(sanitizedData)
+        setResults(data)
 
         // Extract unique model test values
-        const modelTests = Array.from(new Set(sanitizedData.map((item: StudentResult) => item.Model_Test.toString())))
+        const modelTests = Array.from(
+          new Set(data.map((item: StudentResult) => (item.Model_Test || "").toString())),
+        ).filter((test) => test !== "")
+
         setAvailableModelTests(modelTests)
       } catch (error) {
         console.error("Error fetching results:", error)
@@ -65,7 +56,8 @@ export default function Home() {
 
   // Filter results based on selected model test and search query
   const filteredResults = results.filter((result) => {
-    const matchesModelTest = selectedModelTest === "all" || result.Model_Test.toString() === selectedModelTest
+    const matchesModelTest =
+      selectedModelTest === "all" || (result.Model_Test && result.Model_Test.toString() === selectedModelTest)
 
     const matchesSearch =
       searchQuery === "" ||

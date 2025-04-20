@@ -35,49 +35,66 @@ export async function GET() {
       })
 
       if (parseResult.data && Array.isArray(parseResult.data)) {
-        // Validate each row before adding to results
-        const validatedData = parseResult.data.map((row: any) => {
-          // Ensure all required fields exist and have proper types
+        // Log the first row to see the actual structure
+        console.log("CSV Structure:", parseResult.data[0])
+
+        // Process each row based on the actual structure
+        const processedData = parseResult.data.map((row: any, index) => {
+          // Extract model test number from filename if not in data
+          const modelTestMatch = file.match(/modeltest(\d+)/i)
+          const modelTestNumber = modelTestMatch ? Number.parseInt(modelTestMatch[1]) : 0
+
+          // Create a standardized object with all required fields
           return {
-            Position: typeof row.Position === "number" ? row.Position : Number.parseInt(row.Position) || 0,
-            Roll: typeof row.Roll === "number" ? row.Roll : Number.parseInt(row.Roll) || 0,
-            Mobile: typeof row.Mobile === "string" ? row.Mobile : String(row.Mobile || ""),
-            Name: typeof row.Name === "string" ? row.Name : String(row.Name || ""),
-            College: typeof row.College === "string" ? row.College : String(row.College || ""),
-            HSC: typeof row.HSC === "string" ? row.HSC : String(row.HSC || ""),
-            Model_Test: typeof row.Model_Test === "number" ? row.Model_Test : Number.parseInt(row.Model_Test) || 0,
-            PHY_true: typeof row.PHY_true === "number" ? row.PHY_true : Number.parseInt(row.PHY_true) || 0,
-            PHY_false: typeof row.PHY_false === "number" ? row.PHY_false : Number.parseInt(row.PHY_false) || 0,
-            PHY_marks: typeof row.PHY_marks === "number" ? row.PHY_marks : Number.parseInt(row.PHY_marks) || 0,
-            CHEM_true: typeof row.CHEM_true === "number" ? row.CHEM_true : Number.parseInt(row.CHEM_true) || 0,
-            CHEM_false: typeof row.CHEM_false === "number" ? row.CHEM_false : Number.parseInt(row.CHEM_false) || 0,
-            CHEM_marks: typeof row.CHEM_marks === "number" ? row.CHEM_marks : Number.parseInt(row.CHEM_marks) || 0,
-            ICT_true: typeof row.ICT_true === "number" ? row.ICT_true : Number.parseInt(row.ICT_true) || 0,
-            ICT_false: typeof row.ICT_false === "number" ? row.ICT_false : Number.parseInt(row.ICT_false) || 0,
-            ICT_marks: typeof row.ICT_marks === "number" ? row.ICT_marks : Number.parseInt(row.ICT_marks) || 0,
-            MATH_BIO_true:
-              typeof row.MATH_BIO_true === "number" ? row.MATH_BIO_true : Number.parseInt(row.MATH_BIO_true) || 0,
-            MATH_BIO_false:
-              typeof row.MATH_BIO_false === "number" ? row.MATH_BIO_false : Number.parseInt(row.MATH_BIO_false) || 0,
-            MATH_BIO_marks:
-              typeof row.MATH_BIO_marks === "number" ? row.MATH_BIO_marks : Number.parseInt(row.MATH_BIO_marks) || 0,
-            BIO_true: typeof row.BIO_true === "number" ? row.BIO_true : Number.parseInt(row.BIO_true) || 0,
-            BIO_false: typeof row.BIO_false === "number" ? row.BIO_false : Number.parseInt(row.BIO_false) || 0,
-            BIO_marks: typeof row.BIO_marks === "number" ? row.BIO_marks : Number.parseInt(row.BIO_marks) || 0,
-            MATH_true: typeof row.MATH_true === "number" ? row.MATH_true : Number.parseInt(row.MATH_true) || 0,
-            MATH_false: typeof row.MATH_false === "number" ? row.MATH_false : Number.parseInt(row.MATH_false) || 0,
-            MATH_marks: typeof row.MATH_marks === "number" ? row.MATH_marks : Number.parseInt(row.MATH_marks) || 0,
-            PHY_CHEM_ICT:
-              typeof row.PHY_CHEM_ICT === "number" ? row.PHY_CHEM_ICT : Number.parseInt(row.PHY_CHEM_ICT) || 0,
-            Best_Optional: typeof row.Best_Optional === "string" ? row.Best_Optional : String(row.Best_Optional || ""),
-            Total: typeof row.Total === "number" ? row.Total : Number.parseInt(row.Total) || 0,
-            Time: typeof row.Time === "string" ? row.Time : String(row.Time || ""),
-            Total_Wrong: typeof row.Total_Wrong === "number" ? row.Total_Wrong : Number.parseInt(row.Total_Wrong) || 0,
+            Position: row.Position || index + 1,
+            Roll: row.Roll || 0,
+            Mobile: row.Mobile || "",
+            Name: row.Name || "",
+            College: row.College || "",
+            HSC: row.HSC || "",
+            Model_Test: row.Model_Test || row["Model Test"] || modelTestNumber,
+
+            // Physics data
+            PHY_true: extractNumber(row.PHY_true) || extractTrueCount(row.Physics),
+            PHY_false: extractNumber(row.PHY_false) || extractFalseCount(row.Physics),
+            PHY_marks: extractNumber(row.PHY_marks) || extractMarks(row.Physics),
+
+            // Chemistry data
+            CHEM_true: extractNumber(row.CHEM_true) || extractTrueCount(row.Chemistry),
+            CHEM_false: extractNumber(row.CHEM_false) || extractFalseCount(row.Chemistry),
+            CHEM_marks: extractNumber(row.CHEM_marks) || extractMarks(row.Chemistry),
+
+            // ICT data
+            ICT_true: extractNumber(row.ICT_true) || extractTrueCount(row.ICT),
+            ICT_false: extractNumber(row.ICT_false) || extractFalseCount(row.ICT),
+            ICT_marks: extractNumber(row.ICT_marks) || extractMarks(row.ICT),
+
+            // Math/Bio data
+            MATH_BIO_true: extractNumber(row.MATH_BIO_true) || extractTrueCount(row.Math),
+            MATH_BIO_false: extractNumber(row.MATH_BIO_false) || extractFalseCount(row.Math),
+            MATH_BIO_marks: extractNumber(row.MATH_BIO_marks) || extractMarks(row.Math),
+
+            // Biology data
+            BIO_true: extractNumber(row.BIO_true) || extractTrueCount(row.Biology),
+            BIO_false: extractNumber(row.BIO_false) || extractFalseCount(row.Biology),
+            BIO_marks: extractNumber(row.BIO_marks) || extractMarks(row.Biology),
+
+            // Math data (if separate from Math/Bio)
+            MATH_true: extractNumber(row.MATH_true) || 0,
+            MATH_false: extractNumber(row.MATH_false) || 0,
+            MATH_marks: extractNumber(row.MATH_marks) || 0,
+
+            // Other fields
+            PHY_CHEM_ICT: extractNumber(row.PHY_CHEM_ICT) || extractNumber(row["PHY+CHEM+ICT"]),
+            Best_Optional: row.Best_Optional || row["Best Optional"] || "",
+            Total: extractNumber(row.Total),
+            Time: row.Time || "",
+            Total_Wrong: extractNumber(row.Total_Wrong) || extractNumber(row["Total Wrong"]),
           }
         })
 
-        // Add the validated data to our results array
-        allResults.push(...validatedData)
+        // Add the processed data to our results array
+        allResults.push(...processedData)
       }
     }
 
@@ -86,4 +103,46 @@ export async function GET() {
     console.error("Error reading CSV files:", error)
     return NextResponse.json({ error: "Failed to read CSV files" }, { status: 500 })
   }
+}
+
+// Helper function to extract numbers from various formats
+function extractNumber(value: any): number {
+  if (value === undefined || value === null) return 0
+  if (typeof value === "number") return value
+  if (typeof value === "string") {
+    // Try to extract a number from the string
+    const match = value.match(/(\d+(\.\d+)?)/)
+    return match ? Number.parseFloat(match[0]) : 0
+  }
+  return 0
+}
+
+// Helper function to extract true count from combined format (e.g., "23T / 2F")
+function extractTrueCount(value: any): number {
+  if (!value || typeof value !== "string") return 0
+  const match = value.match(/(\d+)T/)
+  return match ? Number.parseInt(match[1]) : 0
+}
+
+// Helper function to extract false count from combined format
+function extractFalseCount(value: any): number {
+  if (!value || typeof value !== "string") return 0
+  const match = value.match(/(\d+)F/)
+  return match ? Number.parseInt(match[1]) : 0
+}
+
+// Helper function to extract marks from combined format or separate line
+function extractMarks(value: any): number {
+  if (!value) return 0
+  if (typeof value === "number") return value
+  if (typeof value === "string") {
+    // Check if it's a combined format with marks on a new line
+    const lines = value.split("\n")
+    if (lines.length > 1) {
+      return extractNumber(lines[1])
+    }
+    // Otherwise try to find a number
+    return extractNumber(value)
+  }
+  return 0
 }
