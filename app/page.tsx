@@ -35,10 +35,22 @@ export default function Home() {
           throw new Error("Invalid data format received from API")
         }
 
-        setResults(data)
+        // Validate and sanitize data
+        const sanitizedData = data.map((item: any) => ({
+          ...item,
+          // Ensure string properties are strings or empty strings
+          Name: typeof item.Name === "string" ? item.Name : String(item.Name || ""),
+          College: typeof item.College === "string" ? item.College : String(item.College || ""),
+          Mobile: typeof item.Mobile === "string" ? item.Mobile : String(item.Mobile || ""),
+          Roll: item.Roll || 0,
+          Model_Test: item.Model_Test || 0,
+          // Add other properties with defaults as needed
+        }))
+
+        setResults(sanitizedData)
 
         // Extract unique model test values
-        const modelTests = Array.from(new Set(data.map((item: StudentResult) => item.Model_Test.toString())))
+        const modelTests = Array.from(new Set(sanitizedData.map((item: StudentResult) => item.Model_Test.toString())))
         setAvailableModelTests(modelTests)
       } catch (error) {
         console.error("Error fetching results:", error)
@@ -57,9 +69,9 @@ export default function Home() {
 
     const matchesSearch =
       searchQuery === "" ||
-      result.Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      result.Roll.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
-      result.College.toLowerCase().includes(searchQuery.toLowerCase())
+      (typeof result.Name === "string" && result.Name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (result.Roll && result.Roll.toString().toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (typeof result.College === "string" && result.College.toLowerCase().includes(searchQuery.toLowerCase()))
 
     return matchesModelTest && matchesSearch
   })

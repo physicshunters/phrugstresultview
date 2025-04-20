@@ -73,13 +73,13 @@ export default function ResultsTable({ results }: ResultsTableProps) {
                 scope="col"
                 className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                {results.some((r) => r.MATH_true !== undefined) ? "Math" : "Math/Bio"}
+                {results.some((r) => r.MATH_true !== undefined && r.MATH_true > 0) ? "Math" : "Math/Bio"}
               </th>
               <th
                 scope="col"
                 className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                {results.some((r) => r.BIO_true !== undefined) ? "Biology" : ""}
+                {results.some((r) => r.BIO_true !== undefined && r.BIO_true > 0) ? "Biology" : ""}
               </th>
               <th
                 scope="col"
@@ -116,97 +116,99 @@ export default function ResultsTable({ results }: ResultsTableProps) {
           <tbody className="bg-white divide-y divide-gray-200">
             {sortedResults.map((result, index) => (
               <tr
-                key={`${result.Roll}-${result.Model_Test}`}
+                key={`${result.Roll || index}-${result.Model_Test || index}`}
                 className={Number(result.Position) <= 3 ? "bg-yellow-50" : ""}
               >
                 <td className="px-3 py-4 whitespace-nowrap">
                   <div
                     className={`text-sm font-medium ${Number(result.Position) <= 3 ? "text-amber-800 font-bold" : "text-gray-900"}`}
                   >
-                    {result.Position}
+                    {result.Position || "-"}
                   </div>
                 </td>
                 <td className="px-3 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{result.Roll}</div>
+                  <div className="text-sm text-gray-900">{result.Roll || "-"}</div>
                 </td>
                 <td className="px-3 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{maskMobileNumber(result.Mobile)}</div>
+                  <div className="text-sm text-gray-900">{result.Mobile ? maskMobileNumber(result.Mobile) : "-"}</div>
                 </td>
                 <td className="px-3 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{result.Name}</div>
+                  <div className="text-sm text-gray-900">{result.Name || "-"}</div>
                 </td>
                 <td className="px-3 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{result.College}</div>
+                  <div className="text-sm text-gray-900">{result.College || "-"}</div>
                 </td>
                 <td className="px-3 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{result.Model_Test}</div>
+                  <div className="text-sm text-gray-900">{result.Model_Test || "-"}</div>
                 </td>
 
                 {/* Physics */}
                 <td className="px-3 py-4 whitespace-nowrap">
                   <div className="text-xs text-center">
-                    <span className="text-green-600">{result.PHY_true}T</span> /{" "}
-                    <span className="text-red-600">{result.PHY_false}F</span>
-                    <div className="font-medium text-gray-900">{result.PHY_marks}</div>
+                    <span className="text-green-600">{result.PHY_true || 0}T</span> /{" "}
+                    <span className="text-red-600">{result.PHY_false || 0}F</span>
+                    <div className="font-medium text-gray-900">{result.PHY_marks || 0}</div>
                   </div>
                 </td>
 
                 {/* Chemistry */}
                 <td className="px-3 py-4 whitespace-nowrap">
                   <div className="text-xs text-center">
-                    <span className="text-green-600">{result.CHEM_true}T</span> /{" "}
-                    <span className="text-red-600">{result.CHEM_false}F</span>
-                    <div className="font-medium text-gray-900">{result.CHEM_marks}</div>
+                    <span className="text-green-600">{result.CHEM_true || 0}T</span> /{" "}
+                    <span className="text-red-600">{result.CHEM_false || 0}F</span>
+                    <div className="font-medium text-gray-900">{result.CHEM_marks || 0}</div>
                   </div>
                 </td>
 
                 {/* ICT */}
                 <td className="px-3 py-4 whitespace-nowrap">
                   <div className="text-xs text-center">
-                    <span className="text-green-600">{result.ICT_true}T</span> /{" "}
-                    <span className="text-red-600">{result.ICT_false}F</span>
-                    <div className="font-medium text-gray-900">{result.ICT_marks}</div>
+                    <span className="text-green-600">{result.ICT_true || 0}T</span> /{" "}
+                    <span className="text-red-600">{result.ICT_false || 0}F</span>
+                    <div className="font-medium text-gray-900">{result.ICT_marks || 0}</div>
                   </div>
                 </td>
 
                 {/* Math/Bio */}
                 <td className="px-3 py-4 whitespace-nowrap">
                   <div className="text-xs text-center">
-                    <span className="text-green-600">{result.MATH_true || result.MATH_BIO_true}T</span> /
-                    <span className="text-red-600">{result.MATH_false || result.MATH_BIO_false}F</span>
-                    <div className="font-medium text-gray-900">{result.MATH_marks || result.MATH_BIO_marks}</div>
+                    <span className="text-green-600">{result.MATH_true || result.MATH_BIO_true || 0}T</span> /{" "}
+                    <span className="text-red-600">{result.MATH_false || result.MATH_BIO_false || 0}F</span>
+                    <div className="font-medium text-gray-900">{result.MATH_marks || result.MATH_BIO_marks || 0}</div>
                   </div>
                 </td>
 
                 {/* Biology (if exists) */}
                 <td className="px-3 py-4 whitespace-nowrap">
-                  {result.BIO_true !== undefined && (
+                  {result.BIO_true !== undefined && result.BIO_true > 0 ? (
                     <div className="text-xs text-center">
-                      <span className="text-green-600">{result.BIO_true}T</span> /{" "}
-                      <span className="text-red-600">{result.BIO_false}F</span>
-                      <div className="font-medium text-gray-900">{result.BIO_marks}</div>
+                      <span className="text-green-600">{result.BIO_true || 0}T</span> /{" "}
+                      <span className="text-red-600">{result.BIO_false || 0}F</span>
+                      <div className="font-medium text-gray-900">{result.BIO_marks || 0}</div>
                     </div>
+                  ) : (
+                    <div className="text-center">-</div>
                   )}
                 </td>
 
                 <td className="px-3 py-4 whitespace-nowrap text-center">
-                  <div className="text-sm font-medium text-gray-900">{result.PHY_CHEM_ICT}</div>
+                  <div className="text-sm font-medium text-gray-900">{result.PHY_CHEM_ICT || 0}</div>
                 </td>
 
                 <td className="px-3 py-4 whitespace-nowrap text-center">
-                  <div className="text-sm font-medium text-gray-900">{result.Best_Optional}</div>
+                  <div className="text-sm font-medium text-gray-900">{result.Best_Optional || "-"}</div>
                 </td>
 
                 <td className="px-3 py-4 whitespace-nowrap text-center">
-                  <div className="text-sm font-bold text-gray-900">{result.Total}</div>
+                  <div className="text-sm font-bold text-gray-900">{result.Total || 0}</div>
                 </td>
 
                 <td className="px-3 py-4 whitespace-nowrap text-center">
-                  <div className="text-sm text-gray-900">{result.Time}</div>
+                  <div className="text-sm text-gray-900">{result.Time || "-"}</div>
                 </td>
 
                 <td className="px-3 py-4 whitespace-nowrap text-center">
-                  <div className="text-sm text-red-600 font-medium">{result.Total_Wrong}</div>
+                  <div className="text-sm text-red-600 font-medium">{result.Total_Wrong || 0}</div>
                 </td>
               </tr>
             ))}
